@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require("../app");
+var debug = require("debug")("chapter-5:server");
+var http = require("http");
+
+/**
+ * Dapatkan port dari lingkungan dan simpan di Express.
+ */
+
+var port = normalizePort(process.env.PORT || "8000");
+app.set("port", port);
+
+/**
+ * Membuat HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Dengarkan di port yang disediakan, di semua antarmuka jaringan.
+ */
+
+server.listen(port);
+server.on("error", onError);
+server.on("listening", onListening);
+
+/**
+ * Normalisasikan port menjadi angka, string, atau false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * "kesalahan" server HTTP.
+ */
+
+function onError(error) {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
+  // menangani kesalahan tertentu dengan pesan ramah
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * listener server HTTP.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  console.log("Server running on port", port);
+  debug("Listening on " + bind);
+}
